@@ -1,9 +1,16 @@
 import axios from "axios";
-const baseURL = import.meta.env.VITE_baseUrl
+import { store } from "../Store/reduxStore.js";
+const baseURL = import.meta.env.VITE_baseUrl;
 
 export const DataBase = axios.create({
-    baseURL,
-    headers:{
-        'Content-Type':'application/json'
-    }
-})
+  baseURL,
+});
+
+DataBase.interceptors.request.use((config) => {
+    const token = store.getState().auth.token
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});

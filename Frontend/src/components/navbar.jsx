@@ -15,14 +15,15 @@ function Navbar({buttonName}) {
 
   return (
     <>
-      <div className="w-full h-16 flex justify-between items-center font-sans px-8 mb-3">
-        <h1 className="text-costomPink text-xl box-border p-1 font-bold">
+      <div className="w-full h-20 flex justify-between items-center font-sans px-8 fixed ">
+        <h1 className="text-white text-xl box-border p-1 font-bold">
           UMS React
         </h1>
        <div>
         <CommonBtn clickEvent={clickEvent} btnName={buttonName}/>
        </div>
       </div>
+
     </>
   );
 }
