@@ -7,7 +7,7 @@ import { PORT } from "./config/env.js";
 const app = express();
 
 app.use(express.json())
-
+app.use('/uploads',express.static('uploads'))
 //Cross-origin 
 app.use(cors());
 

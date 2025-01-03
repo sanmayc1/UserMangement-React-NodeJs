@@ -6,7 +6,6 @@ const verifyToken = (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: no token provided" });
   }
-
   try {
     const secretKey = process.env.SECRET_KEY;
     const decoded = jwt.verify(token, secretKey);

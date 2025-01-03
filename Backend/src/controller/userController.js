@@ -51,14 +51,23 @@ const login = async (req, res) => {
 
 const profile = async(req,res)=>{
   try {
-   console.log(req.user)
+   
     const userDeatils = await User.findById(req.user.id)
-    const {username,email,phone} = userDeatils
-    res.status(200).json({username,email,phone})
+    const {username,email,phone,profilePic} = userDeatils
+    res.status(200).json({username,email,phone,profilePic})
     
   } catch (error) {
     
   }
 }
 
-export { signup, login ,profile};
+const profileUpdate = async(req,res)=>{
+  try {
+    await User.findByIdAndUpdate(req.user.id,{profilePic:req.file.path})
+    res.status(200).json({image:req.file.path})
+  } catch (error) {
+    
+  }
+}
+
+export { signup, login ,profile,profileUpdate};

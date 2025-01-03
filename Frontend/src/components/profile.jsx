@@ -3,9 +3,11 @@ import { Camera, Save, Mail, Phone, User } from "lucide-react";
 import { DataBase } from "../api/axios";
 import { toast, ToastContainer } from "react-toastify";
 import { schema } from "../utils/validationYup";
-
+import CommonBtn from "./SignInLoginButton";
+const baseUrl = import.meta.env.VITE_baseUrl
 const Profile = () => {
-  const [err,setErr] = useState({})
+    
+  const [edit, setEdit] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [profileData, setProfileData] = useState({
     username: "",
@@ -13,7 +15,6 @@ const Profile = () => {
     email: "",
     profilePic: null,
   });
-
 
   //fecthing user details
 
@@ -24,10 +25,11 @@ const Profile = () => {
         const { username, phone, email, profilePic } = response.data;
         console.log(response);
         setProfileData({ username, phone, email, profilePic });
+        setPreviewUrl(`${baseUrl}${profilePic}`)
       } catch (errors) {
-        console.log('err')
-        const err = errors.response.data.message||errors.message
-        tostErr(err)
+        console.log("err");
+        const err = errors.response.data.message || errors.message;
+        tostErr(err);
       }
     };
     fecthUserData();
@@ -36,11 +38,12 @@ const Profile = () => {
   // profile picture change and add to show preview
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+
     if (file) {
       setProfileData((prev) => ({ ...prev, profilePic: file }));
       const reader = new FileReader();
       reader.onloadend = () => {
-        console.log(reader.result);
+        setEdit(true);
         setPreviewUrl(reader.result);
       };
       reader.readAsDataURL(file);
@@ -50,36 +53,46 @@ const Profile = () => {
   //filed change
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setEdit(true);
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
   //form submit
 
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        await schema.validateAt("username",profileData)
-        await schema.validateAt("phone",profileData)
+      await schema.validateAt("username", profileData);
+      await schema.validateAt("phone", profileData);
+      const formData = new FormData();
+      formData.append("profile", profileData.profilePic);
+      formData.append("username", profileData.username);
+      formData.append("phone", profileData.phone);
+      try {
+        const response = await DataBase.post("/user/profileupdate", formData);
+        console.log(response.data.image)
+      } catch (error) {
+
+      }
     } catch (validationErr) {
-        tostErr(validationErr.message)
+      tostErr(validationErr.message);
     }
+  };
+  // error message alert
 
-  }
-   // error message alert 
-
-   const tostErr = (err)=>{
+  const tostErr = (err) => {
     toast.error(err, {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-  }
- 
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white py-12 px-4">
@@ -149,7 +162,7 @@ const Profile = () => {
                       name="email"
                       defaultValue={profileData.email}
                       disabled
-                      className="w-full bg-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 hover:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -170,14 +183,19 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className={`bg-blue-500  hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors`}
-                >
-                  <Save className="w-5 h-5" />
-                  Save Changes
-                </button>
+              <div className="w-full flex justify-end">
+                <div className="max-w-fit flex-col ">
+                  {edit && (
+                    <CommonBtn
+                      btnName={
+                        <>
+                          <Save className="w-5 h-5" />
+                          Save Changes
+                        </>
+                      }
+                    />
+                  )}
+                </div>
               </div>
             </form>
           </div>
