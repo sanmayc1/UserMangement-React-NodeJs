@@ -38,15 +38,27 @@ const login = async (req, res) => {
        return res.status(401).json({ loginErr: "Invalid Credentials" });
       }
       
-      const data = {username:user.username,id:user.id}
+      const userDetails = {username:user.username,id:user.id,role:user.role}
       const secretKey = process.env.SECRET_KEY
-      const token = jwt.sign(data,secretKey,{expiresIn:'1h'})
-        res.status(200).json({token,data});
-      
-     
-     
-    
-  } catch (error) {}
+      const token = jwt.sign(userDetails,secretKey,{expiresIn:'1h'})
+        res.status(200).json({token,userDetails});
+  } catch (error) {
+    console.log(error)
+  }
 };
 
-export { signup, login };
+//Profile data fetching 
+
+const profile = async(req,res)=>{
+  try {
+   console.log(req.user)
+    const userDeatils = await User.findById(req.user.id)
+    const {username,email,phone} = userDeatils
+    res.status(200).json({username,email,phone})
+    
+  } catch (error) {
+    
+  }
+}
+
+export { signup, login ,profile};
