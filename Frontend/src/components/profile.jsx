@@ -23,9 +23,11 @@ const Profile = () => {
       try {
         const response = await DataBase.get("/user/profile");
         const { username, phone, email, profilePic } = response.data;
-        console.log(response);
         setProfileData({ username, phone, email, profilePic });
-        setPreviewUrl(`${baseUrl}${profilePic}`)
+        if(profilePic){
+          setPreviewUrl(`${baseUrl}${profilePic}`)
+        }
+       
       } catch (errors) {
         console.log("err");
         const err = errors.response.data.message || errors.message;
@@ -70,7 +72,7 @@ const Profile = () => {
       formData.append("phone", profileData.phone);
       try {
         const response = await DataBase.post("/user/profileupdate", formData);
-        console.log(response.data.image)
+        setEdit(false)
       } catch (error) {
 
       }

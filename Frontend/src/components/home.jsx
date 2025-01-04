@@ -12,7 +12,6 @@ const Home = () => {
           dispatch(removeToken())
           dispatch(Logout())
           navigate("/login");
-         
     }
 
     const profile = ()=>{

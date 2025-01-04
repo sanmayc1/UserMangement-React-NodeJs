@@ -1,7 +1,8 @@
 import User from "../model/user.js";
 import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import fs from "fs";
+import tokenGenerate from "../utils/tokenGenerate.js";
 
 const saltRound = 12;
 
@@ -30,44 +31,65 @@ const login = async (req, res) => {
     //check user exist
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-      return res.status(401).json({ loginErr: "User not found please sign up" });
+      return res
+        .status(401)
+        .json({ loginErr: "User not found please sign up" });
     }
-      //matching user password
-      const match = await compare(req.body.password, user.password);
-      if (!match) {
-       return res.status(401).json({ loginErr: "Invalid Credentials" });
-      }
+    //matching user password
+    const match = await compare(req.body.password, user.password);
+    if (!match) {
       
-      const userDetails = {username:user.username,id:user.id,role:user.role}
-      const secretKey = process.env.SECRET_KEY
-      const token = jwt.sign(userDetails,secretKey,{expiresIn:'1h'})
-        res.status(200).json({token,userDetails});
+      return res.status(401).json({ loginErr: "Invalid Credentials" });
+    }
+
+    const date = new Date().toLocaleString().split(',')[0]
+    await User.findByIdAndUpdate(user.id,{lastlogin:date})
+    const userDetails = {
+      username: user.username,
+      id: user.id,
+      role: user.role,
+    };
+    // const secretKey = process.env.SECRET_KEY;
+    // const token = jwt.sign(userDetails, secretKey, { expiresIn: "1h" });
+    const token = tokenGenerate(userDetails)
+    res.status(200).json({ token, userDetails });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
-//Profile data fetching 
+//Profile data fetching
 
-const profile = async(req,res)=>{
+const profile = async (req, res) => {
   try {
-   
-    const userDeatils = await User.findById(req.user.id)
-    const {username,email,phone,profilePic} = userDeatils
-    res.status(200).json({username,email,phone,profilePic})
-    
+    const userDeatils = await User.findById(req.user.id);
+    const { username, email, phone, profilePic } = userDeatils;
+    res.status(200).json({ username, email, phone, profilePic });
   } catch (error) {
-    
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
-const profileUpdate = async(req,res)=>{
+const profileUpdate = async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.user.id,{profilePic:req.file.path})
-    res.status(200).json({image:req.file.path})
-  } catch (error) {
-    
-  }
-}
+    const file = req.file;
+    /// if user aleready have a profile delete the old one
+    if (file) {
+      const user = await User.findById(req.user.id);
+      if (user.profilePic) {
+        //delete old file
+        fs.unlink(user.profilePic, (err) => {
+          if (err) console.log(err);
+          else console.log("old image deleted");
+        });
+      }
+      await User.findByIdAndUpdate(req.user.id, { profilePic: file.path });
+    }
+    // updating other user details
+    const { username, phone } = req.body;
+    const save = await User.findByIdAndUpdate(req.user.id, { username, phone });
+    res.status(200).json({ image: save });
+  } catch (error) {}
+};
 
-export { signup, login ,profile,profileUpdate};
+export { signup, login, profile, profileUpdate };

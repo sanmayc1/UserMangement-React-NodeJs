@@ -27,7 +27,6 @@ const SignupForm = () => {
 
     try {
       await schema.validateAt(name, updatedFormData);
-
       setErr((prevErr) => {
         const { [name]: _, ...remaingErr } = prevErr;
         return remaingErr;
@@ -118,7 +117,7 @@ const SignupForm = () => {
                     id="name"
                     name="username"
                     onChange={handleChange}
-                    value={formData.name}
+                    value={formData.username}
                     type="text"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                     placeholder="John Doe"

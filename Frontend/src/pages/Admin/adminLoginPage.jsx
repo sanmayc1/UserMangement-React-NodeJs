@@ -1,20 +1,18 @@
-import Login from "../components/userLogin.jsx";
-import Navbar from "../components/navbar.jsx";
+import AdminLogin from "../../components/admin/adminLogin.jsx";
 import { motion } from "framer-motion";
-const LoginPage = () => {
+
+const AdminLoginPage = () => {
   return (
     <>
-      <Navbar buttonName={"Sign Up"} />
       <motion.div
         initial={{ y: -1000 }}
         animate={{ y: 0 }}
         exit={{ y: 2000 }}
         transition={{ duration: 0.5 }}
       >
-        <Login />
+        <AdminLogin />
       </motion.div>
     </>
   );
 };
-
-export default LoginPage;
+export default AdminLoginPage;
