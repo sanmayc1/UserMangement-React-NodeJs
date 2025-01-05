@@ -1,4 +1,4 @@
-import AdminLogin from "../../components/admin/adminLogin.jsx";
+import AdminLogin from "../../components/admin/login/adminLogin.jsx";
 import { motion } from "framer-motion";
 
 const AdminLoginPage = () => {

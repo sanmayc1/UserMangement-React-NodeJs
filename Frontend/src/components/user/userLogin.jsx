@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { schema } from "../utils/validationYup.jsx";
-import { DataBase } from "../api/axios.jsx";
-import { login } from "../Store/Slice/userSlice.js";
+import { schema } from "../../utils/validationYup.jsx";
+import { DataBase } from "../../api/axios.jsx";
+import { login } from "../../Store/Slice/userSlice.js";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addToken } from "../Store/Slice/authToken.js";
-import LoginForm from "./loginForm.jsx";
+import { addToken } from "../../Store/Slice/authToken.js";
+import LoginForm from "../loginForm.jsx";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);

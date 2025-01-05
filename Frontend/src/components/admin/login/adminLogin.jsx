@@ -1,12 +1,18 @@
 import { useState } from "react";
-import LoginForm from "../loginForm.jsx";
-import { schema } from "../../utils/validationYup.jsx";
-import { DataBase } from "../../api/axios.jsx";
+import LoginForm from "../../loginForm.jsx";
+import { schema } from "../../../utils/validationYup.jsx";
+import { DataBase } from "../../../api/axios.jsx";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../../Store/Slice/userSlice.js";
+import { addToken, removeToken } from "../../../Store/Slice/authToken.js";
 
 const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [err, setErr] = useState({});
+  const dispath = useDispatch()
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,9 +27,12 @@ const AdminLogin = () => {
       setLoading(false);
       try {
         const response =await DataBase.post('admin/login',formData)
-        console.log(response.data)
+        const {username,id,role} = response.data.details
+        dispath(login({username,id,role}))
+        dispath(addToken({token:response.data.token}))
+        navigate("/admin/dashboard")
       } catch (error) {
-        console.log(error.response.data.message)
+        setErr({loginErr:error.response.data.message})
       }
     } catch (error) {
       setErr({ email: error.message });

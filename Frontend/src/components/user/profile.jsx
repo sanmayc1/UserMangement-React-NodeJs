@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Camera, Save, Mail, Phone, User } from "lucide-react";
-import { DataBase } from "../api/axios";
+import { DataBase } from "../../api/axios.jsx";
 import { toast, ToastContainer } from "react-toastify";
-import { schema } from "../utils/validationYup";
-import CommonBtn from "./SignInLoginButton";
-const baseUrl = import.meta.env.VITE_baseUrl
+import { schema } from "../../utils/validationYup.jsx";
+import CommonBtn from "../SignInLoginButton.jsx";
+import { baseUrl } from "../../api/constants.jsx";
 const Profile = () => {
-    
   const [edit, setEdit] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [profileData, setProfileData] = useState({
@@ -24,10 +23,9 @@ const Profile = () => {
         const response = await DataBase.get("/user/profile");
         const { username, phone, email, profilePic } = response.data;
         setProfileData({ username, phone, email, profilePic });
-        if(profilePic){
-          setPreviewUrl(`${baseUrl}${profilePic}`)
+        if (profilePic) {
+          setPreviewUrl(`${baseUrl}${profilePic}`);
         }
-       
       } catch (errors) {
         console.log("err");
         const err = errors.response.data.message || errors.message;
@@ -72,10 +70,8 @@ const Profile = () => {
       formData.append("phone", profileData.phone);
       try {
         const response = await DataBase.post("/user/profileupdate", formData);
-        setEdit(false)
-      } catch (error) {
-
-      }
+        setEdit(false);
+      } catch (error) {}
     } catch (validationErr) {
       tostErr(validationErr.message);
     }

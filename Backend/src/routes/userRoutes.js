@@ -8,6 +8,6 @@ const userRouter = express.Router();
 userRouter.post("/signup", validtion, signup);
 userRouter.post('/login',login);
 userRouter.get('/profile',verifyToken,profile)
-userRouter.post('/profileupdate',upload.single('profile'),verifyToken,profileUpdate)
+userRouter.post('/profileupdate',verifyToken,upload.single('profile'),profileUpdate)
 
 export default userRouter;

@@ -1,31 +1,63 @@
 import { useState } from "react";
 import CommonBtn from "../../../SignInLoginButton.jsx";
 import { motion } from "framer-motion";
+import { InitialformDataForAdminUserModal } from "../../../../utils/initialFormData.jsx";
+import { tostConfig } from "../../../../utils/tostify.jsx";
+import { schema } from "../../../../utils/validationYup.jsx";
+import { DataBase } from "../../../../api/axios.jsx";
+import { toast, ToastContainer } from "react-toastify";
+
 const CreateUserModal = ({ isOpen, setIsOpen }) => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    role: "",
-  });
-  //modal close
-  const cancel = () => {
-    setIsOpen(false);
-    setFormData({
-      username: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: "",
-      role: "",
-    });
-  };
+  if (!isOpen) {
+    return null;
+  }
+
+  const [formData, setFormData] = useState(InitialformDataForAdminUserModal);
+  const [err, setErr] = useState({});
+
   ///handlechanges in input filed
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  //on submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      //validation
+      await schema.validate(formData, { abortEarly: false });
+      setErr({});
+      try {
+        const response = await DataBase.post("admin/adduser", formData);
+         ///Success response
+        if (response.status === 201) {
+          toast.success("User created successfully", tostConfig);
+          setTimeout(() => setIsOpen(false), 2000);
+        }
+      } catch (errorResponse) {
+        if (
+          errorResponse.response?.status === 400 &&
+          errorResponse.response.data?.validationErr
+        ) {
+          setErr(errorResponse.response.data.validationErr);
+        } else {
+          const err = errorResponse.response?.data?.message;
+          toast.error(err, tostConfig);
+        }
+        console.log(errorResponse.response.data);
+      }
+    } catch (error) {
+      // validation error
+
+      if (error.inner) {
+        const validatationErr = {};
+        error.inner.forEach((err) => {
+          const { path, message } = err;
+          validatationErr[path] = message;
+        });
+        setErr(validatationErr);
+      }
+    }
   };
 
   return (
@@ -47,7 +79,7 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
               <div className="insert-0 flex justify-center mt-13 p-10">
                 <h1 className="font-bold text-2xl">Create User</h1>
               </div>
-              <form className="space-y-5">
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div className="px-14 pb-10">
                   <div>
                     <label
@@ -61,16 +93,16 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
                         id="name"
                         name="username"
                         onChange={handleChange}
-                        value={formData.name}
+                        value={formData.username}
                         type="text"
-                        className="appearance-none mb-3 bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                        className="appearance-none mb-1 bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="John Doe"
                       />
-                      {/* {err.username && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.username}
-                    </span>
-                  )} */}
+                      {err.username && (
+                        <span className="text-red-500 text-xs p-2">
+                          {err.username}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -88,14 +120,14 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
                         type="number"
                         onChange={handleChange}
                         value={formData.phone}
-                        className="appearance-none mb-3  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                        className="appearance-none mb-1  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="Moblile Number"
                       />
-                      {/* {err.phone && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.phone}
-                    </span>
-                  )} */}
+                      {err.phone && (
+                        <span className="text-red-500 text-xs p-2">
+                          {err.phone}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -113,14 +145,14 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
                         type="text"
                         onChange={handleChange}
                         value={formData.email}
-                        className="appearance-none mb-3  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                        className="appearance-none mb-1  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="john@gmail.com"
                       />
-                      {/* {err.email && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.email}
-                    </span>
-                  )} */}
+                      {err.email && (
+                        <span className="text-red-500 text-xs p-2">
+                          {err.email}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -138,14 +170,14 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
                         type="password"
                         onChange={handleChange}
                         value={formData.password}
-                        className="appearance-none mb-3  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                        className="appearance-none mb-1  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="••••••••"
                       />
-                      {/* {err.password && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.password}
-                    </span>
-                  )} */}
+                      {err.password && (
+                        <span className="text-red-500 text-xs p-2">
+                          {err.password}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -163,14 +195,14 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
                         type="password"
                         onChange={handleChange}
                         value={formData.confirmPassword}
-                        className=" appearance-none mb-5  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                        className=" appearance-none mb-1  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="••••••••"
                       />
-                      {/* {err.confirmPassword && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.confirmPassword}
-                    </span>
-                  )} */}
+                      {err.confirmPassword && (
+                        <span className="text-red-500 text-xs p-2">
+                          {err.confirmPassword}
+                        </span>
+                      )}
                       <div className="mb-5 flex ">
                         <div className="flex items-center">
                           <input
@@ -214,17 +246,22 @@ const CreateUserModal = ({ isOpen, setIsOpen }) => {
                   </div>
 
                   <div className="flex gap-2 ">
-                    <CommonBtn btnName={"Cancel"} clickEvent={cancel} type={"button"} />
+                    <CommonBtn
+                      btnName={"Cancel"}
+                      clickEvent={() => setIsOpen(false)}
+                      type={"button"}
+                    />
                     <CommonBtn btnName={"Create"} />
                   </div>
                 </div>
               </form>
             </div>
           </div>
+          <ToastContainer />
         </motion.div>
       )}
     </>
   );
 };
 
-export default CreateUserModal ;
+export default CreateUserModal;

@@ -1,7 +1,8 @@
 import User from "../model/user.js";
-import { compare } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import tokenGenerate from "../utils/tokenGenerate.js";
 import fs from "fs";
+const saltRound = 12;
 
 // Login logic
 const login = async (req, res) => {
@@ -61,6 +62,55 @@ const deleteUser = async (req, res) => {
   }
 };
 
+///add new user
+
+const addNewUser = async (req, res) => {
+  try {
+    //Checking the the user is already exist
+    const existing = await User.findOne({ email: req.body.email });
+    if (existing) {
+      return res.status(409).json({ message: "User alerady existing" });
+    }
+    // Save user data in database
+    const hashPassword = await hash(req.body.password, saltRound);
+    const { confirmPassword, ...userData } = req.body;
+    const NewUser = new User({ ...userData, password: hashPassword });
+    await NewUser.save();
+    return res.status(201).json({ status: "sucess" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log(error.message);
+  }
+};
+
+///edit user details
+
+const editUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { username, email, phone } = req.body;
+    const user = await User.findById(id);
+
+    //checking email is same or change
+    if (email !== user.email) {
+      //checking this email is exists
+      const exist = await User.findOne({ email });
+      if (!exist.$isEmpty()) {
+        return res.status(409).json({message:"User already exist"})
+      }
+    }
+    
+    user.email =email
+    user.phone =phone
+    user.username= username
+
+    const save = await user.save()
+    if(!save.$isEmpty()){
+      res.status(200).json({message:"User details Edited Successfully",user})
+    }
 
 
-export { login, dataFetch, deleteUser };
+  } catch (error) {}
+};
+
+export { login, dataFetch, deleteUser, addNewUser, editUser };

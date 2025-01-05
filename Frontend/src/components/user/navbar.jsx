@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import CommonBtn from "./SignInLoginButton.jsx";
+import CommonBtn from "../SignInLoginButton.jsx";
 
 function Navbar({buttonName}) {
 

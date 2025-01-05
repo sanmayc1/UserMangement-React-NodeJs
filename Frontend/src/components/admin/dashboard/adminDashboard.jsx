@@ -6,6 +6,7 @@ import { DataBase } from "../../../api/axios";
 import CreateUserModal from "./modals/createUserModal.jsx";
 import EditUserModal from "./modals/editUserModal.jsx";
 
+
 const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [users,setUsers] = useState([])
@@ -13,7 +14,6 @@ const AdminDashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editOpen,setEditOpen] = useState(false);
   const [userDetails,setUserDetails]=useState({})
-  
   ///fetching users 
   useEffect(()=>{
     const fecthUsers =async()=>{
@@ -22,11 +22,11 @@ const AdminDashboard = () => {
      setFilteredUser(response.data.users)
     }
     fecthUsers()
-    const interval = setInterval(fecthUsers,30000)
+    const interval = setInterval(fecthUsers,15000)
     return ()=> clearInterval(interval)
+    
   },[])
-
-
+  
   ///Search option
 
   const filterBySearch=()=>{
@@ -46,10 +46,10 @@ const AdminDashboard = () => {
       <main className="p-6">
         <div className="bg-gray-800 rounded-xl shadow-xl">
           <TableHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} filterBySearch={filterBySearch} setIsOpen={setIsOpen} />
-          <Table users={filteredUser} setUsers={setUsers} setUserDetails={setUserDetails} setEditOpen={setEditOpen}  />
+          <Table users={filteredUser} setFilteredUser={setFilteredUser} setUserDetails={setUserDetails} setEditOpen={setEditOpen}  />
         </div>
       </main>
-      <CreateUserModal isOpen={isOpen} setIsOpen={()=>setIsOpen(false)} />
+      <CreateUserModal  isOpen={isOpen} setIsOpen={()=>setIsOpen(false)} />
       <EditUserModal isOpen={editOpen} setIsOpen={setEditOpen} userDetails={userDetails}/>
     </div>
   );

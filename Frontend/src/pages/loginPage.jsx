@@ -1,5 +1,5 @@
-import Login from "../components/userLogin.jsx";
-import Navbar from "../components/navbar.jsx";
+import Login from "../components/user/userLogin.jsx";
+import Navbar from "../components/user/navbar.jsx";
 import { motion } from "framer-motion";
 const LoginPage = () => {
   return (

@@ -1,5 +1,5 @@
-import Navbar from "../components/navbar.jsx";
-import SignupForm from "../components/signup.jsx";
+import Navbar from "../components/user/navbar.jsx";
+import SignupForm from "../components/user/signup.jsx";
 import { motion } from "framer-motion";
 const SignupPage = () => {
   return (

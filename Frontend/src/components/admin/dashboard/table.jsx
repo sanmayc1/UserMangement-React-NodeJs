@@ -1,13 +1,14 @@
 import { Edit, Trash, User } from "lucide-react";
 import { DataBase } from "../../../api/axios";
+import { baseUrl } from "../../../api/constants.jsx";
 
-const Table = ({ users, setUsers, setEditOpen, setUserDetails }) => {
+const Table = ({ users, setFilteredUser, setEditOpen, setUserDetails }) => {
   //delete user
   const deleteUser = async (id, path) => {
     try {
       const response = await DataBase.post("admin/deleteuser", { id, path });
       if (response.status === 200) {
-        setUsers(users.filter((user) => user._id !== id));
+        setFilteredUser(users.filter((user) => user._id !== id));
       }
     } catch (error) {}
   };
@@ -46,7 +47,7 @@ const Table = ({ users, setUsers, setEditOpen, setUserDetails }) => {
                   {user.profilePic ? (
                     <img
                       className="max-w-9 rounded-full "
-                      src={`http://localhost:8080/${user.profilePic}`}
+                      src={`${baseUrl}${user.profilePic}`}
                       alt=""
                     />
                   ) : (

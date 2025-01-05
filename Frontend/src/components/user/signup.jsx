@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { schema } from "../utils/validationYup.jsx";
-import { DataBase } from "../api/axios.jsx";
+import { schema } from "../../utils/validationYup.jsx";
+import { DataBase } from "../../api/axios.jsx";
 import ReactLoading from "react-loading";
-import CommonBtn from "./SignInLoginButton.jsx";
+import CommonBtn from "../SignInLoginButton.jsx";
 import { toast, ToastContainer } from "react-toastify";
+import { tostConfig } from "../../utils/tostify.jsx";
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
@@ -54,19 +55,11 @@ const SignupForm = () => {
         const status = error.response?.status;
         if (status === 400) {
           setErr(error.response.data.validationErr);
+         
         } else if (status === 409) {
           setErr(error.response.data);
         } else {
-          toast.error("Something went wrong", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
+          toast.error("Something went wrong", tostConfig);
         }
       }
     } catch (error) {
@@ -82,18 +75,7 @@ const SignupForm = () => {
 
   return (
     <>
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
+     
 
       <div className="min-h-screen pt-14">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -245,6 +227,7 @@ const SignupForm = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 };

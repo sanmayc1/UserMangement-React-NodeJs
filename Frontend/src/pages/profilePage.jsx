@@ -1,4 +1,4 @@
-import Profile from "../components/profile.jsx";
+import Profile from "../components/user/profile.jsx";
 import { motion } from 'framer-motion';
 const ProfilePage = () => {
   return (

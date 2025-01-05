@@ -1,10 +1,59 @@
 import { motion } from "framer-motion";
 import CommonBtn from "../../../SignInLoginButton.jsx";
 import { DataBase } from "../../../../api/axios.jsx";
+import { baseUrl } from "../../../../api/constants.jsx";
 import { User } from "lucide-react";
+import {  useState } from "react";
+import { schema } from "../../../../utils/validationYup.jsx";
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import { tostConfig } from "../../../../utils/tostify.jsx";
 
 const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
-  console.log;
+  if (!isOpen) {
+    return null;
+  }
+
+  const [formData, setFormData] = useState({
+    username: userDetails.username || "",
+    email: userDetails.email || "",
+    phone: userDetails.phone || "",
+  });
+
+  //onChange
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  //onSubmit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await schema.validateAt("username", formData);
+      await schema.validateAt("email", formData);
+      await schema.validateAt("phone", formData);
+
+      try {
+        const response = await DataBase.patch(
+          `admin/edituser/${userDetails._id}`,
+          formData
+        );
+
+        if (response.status === 200) {
+          toast.success("User updated successfully", tostConfig);
+          setTimeout(() => setIsOpen(false), 2000);
+        }
+      } catch (responseErr) {
+        console.log(responseErr.response);
+        toast.error(responseErr.response.data.message, tostConfig);
+      }
+    } catch (error) {
+      if (error) {
+        toast.error(error.message, tostConfig);
+      }
+    }
+  };
+
   return (
     <>
       {isOpen && (
@@ -28,7 +77,7 @@ const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
                 {userDetails?.profilePic ? (
                   <img
                     className="max-w-32 rounded-full"
-                    src={`http://localhost:8080/${userDetails.profilePic}`}
+                    src={`${baseUrl}${userDetails.profilePic}`}
                     alt=""
                   />
                 ) : (
@@ -38,7 +87,7 @@ const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
                 )}
               </div>
 
-              <form className="space-y-5">
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div className="px-14 pb-10">
                   <div>
                     <label
@@ -51,17 +100,12 @@ const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
                       <input
                         id="name"
                         name="username"
-                        // onChange={handleChange}
-                        value={userDetails.username}
+                        onChange={handleChange}
+                        value={formData.username}
                         type="text"
                         className="appearance-none mb-3 bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="John Doe"
                       />
-                      {/* {err.username && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.username}
-                    </span>
-                  )} */}
                     </div>
                   </div>
 
@@ -77,16 +121,11 @@ const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
                         id="phone"
                         name="phone"
                         type="number"
-                        // onChange={handleChange}
-                        value={userDetails.phone}
+                        onChange={handleChange}
+                        value={formData.phone}
                         className="appearance-none mb-3  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="Moblile Number"
                       />
-                      {/* {err.phone && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.phone}
-                    </span>
-                  )} */}
                     </div>
                   </div>
 
@@ -102,16 +141,11 @@ const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
                         id="email"
                         name="email"
                         type="text"
-                        // onChange={handleChange}
-                        value={userDetails.email}
+                        onChange={handleChange}
+                        value={formData.email}
                         className="appearance-none mb-3  bg-gray-700 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                         placeholder="john@gmail.com"
                       />
-                      {/* {err.email && (
-                    <span className="text-red-500 text-xs p-2">
-                      {err.email}
-                    </span>
-                  )} */}
                     </div>
                   </div>
                   <div className="flex gap-2 mt-5 ">
@@ -126,6 +160,19 @@ const EditUserModal = ({ isOpen, setIsOpen, userDetails }) => {
               </form>
             </div>
           </div>
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss={false}
+            draggable={false}
+            pauseOnHover={false}
+            theme="dark"
+            transition={Bounce}
+          />
         </motion.div>
       )}
     </>
